@@ -144,6 +144,13 @@ class QuizGame:
 
         print("=" * 35)
 
+    def add_quiz(self):
+        print("\n=== 퀴즈 추가 ===")
+        question = input("문제를 입력하세요: ")
+        answer = input("정답을 입력하세요: ")
+        self.quizzes.append({"question": question, "answer": answer})
+        print("퀴즈가 추가되었습니다!")
+
 
     def run(self):
         """게임 메인 루프"""
@@ -156,7 +163,7 @@ class QuizGame:
             if choice == 1:
                 self.play_quiz()
             elif choice == 2:
-                print("  🚧 준비 중인 기능입니다.")
+                self.add_quiz()   # 
             elif choice == 3:
                 print("  🚧 준비 중인 기능입니다.")
             elif choice == 4:

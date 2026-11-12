@@ -93,33 +93,79 @@ class QuizGame:
 
             return number
 
+    def play_quiz(self):
+        """퀴즈를 진행하고 점수를 계산한다."""
+        print("\n" + "=" * 35)
+        print("  🚀 퀴즈를 시작합니다!")
+        print("=" * 35)
+
+        score = 0
+        for quiz in self.quizzes:
+            quiz.show()
+            user_choice = self.input_number("  정답 번호를 입력하세요 >> ", 1, 4)
+
+            if quiz.is_correct(user_choice):
+                print("  ✅ 정답입니다!")
+                score += 1
+            else:
+                print(f"  ❌ 틀렸습니다. 정답은 {quiz.answer}번입니다.")
+
+        print("\n" + "=" * 35)
+        print(f"  🏁 게임 종료! 당신의 점수는 {score}/{len(self.quizzes)}점입니다.")
+        print("=" * 35)
+
+        if score > self.best_score:
+            print("  🎊 최고 기록 경신!")
+            self.best_score = score
+
+    def show_score(self):
+        """현재 최고 점수를 출력한다."""
+        print("\n" + "=" * 35)
+        print("  🏆 점수 확인")
+        print("=" * 35)
+
+        total = len(self.quizzes)
+
+        if self.best_score == 0:
+            print("  아직 퀴즈를 풀지 않았습니다.")
+            print("  퀴즈를 먼저 풀어보세요! 💪")
+        else:
+            print(f"  최고 점수 : {self.best_score} / {total} 점")
+
+            # 점수에 따라 다른 메시지 출력
+            if self.best_score == total:
+                print("  등급      : ⭐ 역사 마스터!")
+            elif self.best_score >= total * 0.8:
+                print("  등급      : 🥇 역사 박사")
+            elif self.best_score >= total * 0.6:
+                print("  등급      : 🥈 역사 학도")
+            else:
+                print("  등급      : 🥉 역사 입문자")
+
+        print("=" * 35)
+
+
     def run(self):
         """게임 메인 루프"""
         print("\n  🌍 세계사 인물 퀴즈 게임을 시작합니다!")
 
         while True:
             self.show_menu()
-
             choice = self.input_number("  번호를 선택하세요 >> ", 1, 5)
 
             if choice == 1:
-                print("\n  [퀴즈 풀기] 기능은 다음 단계에서 구현합니다.")
+                self.play_quiz()
             elif choice == 2:
-                print("\n  [퀴즈 추가] 기능은 다음 단계에서 구현합니다.")
+                print("  🚧 준비 중인 기능입니다.")
             elif choice == 3:
-                print("\n  [퀴즈 목록] 기능은 다음 단계에서 구현합니다.")
+                print("  🚧 준비 중인 기능입니다.")
             elif choice == 4:
-                print("\n  [점수 확인] 기능은 다음 단계에서 구현합니다.")
+                self.show_score()  #
             elif choice == 5:
-                print("\n  게임을 종료합니다. 수고하셨습니다! 👋")
+                print("\n  👋 게임을 종료합니다. 수고하셨습니다!")
                 break
 
 if __name__ == "__main__":
-    # Quiz 클래스 동작 확인 (임시 테스트)
     game = QuizGame()
-    quiz = game.quizzes[0]
+    game.run()
 
-    quiz.show()
-
-    print(quiz.is_correct(2))   # True
-    print(quiz.is_correct(1))   # False

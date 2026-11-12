@@ -148,8 +148,13 @@ class QuizGame:
         print("\n=== 퀴즈 추가 ===")
         question = input("문제를 입력하세요: ")
         answer = input("정답을 입력하세요: ")
-        self.quizzes.append({"question": question, "answer": answer})
+        self.quizzes.append(Quiz(question, answer))  # 
         print("퀴즈가 추가되었습니다!")
+
+    def show_quiz_list(self):
+        print("\n=== 퀴즈 목록 ===")
+        for i, quiz in enumerate(self.quizzes, 1):
+            print(f"{i}. {quiz.question}")  # 
 
 
     def run(self):
@@ -165,7 +170,7 @@ class QuizGame:
             elif choice == 2:
                 self.add_quiz()   # 
             elif choice == 3:
-                print("  🚧 준비 중인 기능입니다.")
+                self.show_quiz_list()   # 
             elif choice == 4:
                 self.show_score()  #
             elif choice == 5:

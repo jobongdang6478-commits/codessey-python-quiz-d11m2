@@ -1,3 +1,5 @@
+import json
+
 # quiz_game.py
 class Quiz:
     """퀴즈 한 문제를 담는 클래스"""
@@ -12,6 +14,19 @@ class Quiz:
         self.choices = choices
         self.answer = answer
 
+    def to_dict(self):
+        """Quiz 객체 → 딕셔너리 (저장용)"""
+        return {
+            "question": self.question,
+            "choices": self.choices,
+            "answer": self.answer
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        """딕셔너리 → Quiz 객체 (불러오기용)"""
+        return cls(data["question"], data["choices"], data["answer"])
+
     def show(self):
         """문제와 선택지를 출력한다."""
         print(f"\n  📜 {self.question}")
@@ -24,13 +39,14 @@ class Quiz:
         """입력한 번호가 정답이면 True, 아니면 False를 반환한다."""
         return self.answer == user_answer
 
+
 class QuizGame:
     """세계사 인물 퀴즈 게임 전체를 관리하는 클래스"""
 
     def __init__(self):
         self.best_score = 0     # 최고 점수
 
-        # 세계사 인물 퀴즈 데이터
+        # 세계사 인물 퀴즈 기본 데이터
         self.quizzes = [
             Quiz(
                 "만유인력의 법칙을 발견한 영국의 과학자는?",
@@ -117,6 +133,7 @@ class QuizGame:
         if score > self.best_score:
             print("  🎊 최고 기록 경신!")
             self.best_score = score
+            self.save_state()  # 최고 점수 경신 시 자동 저장
 
     def show_score(self):
         """현재 최고 점수를 출력한다."""
@@ -132,7 +149,6 @@ class QuizGame:
         else:
             print(f"  최고 점수 : {self.best_score} / {total} 점")
 
-            # 점수에 따라 다른 메시지 출력
             if self.best_score == total:
                 print("  등급      : ⭐ 역사 마스터!")
             elif self.best_score >= total * 0.8:
@@ -145,20 +161,53 @@ class QuizGame:
         print("=" * 35)
 
     def add_quiz(self):
+        """사용자로부터 문제, 4개의 보기, 정답 번호를 입력받아 퀴즈를 추가한다."""
         print("\n=== 퀴즈 추가 ===")
-        question = input("문제를 입력하세요: ")
-        answer = input("정답을 입력하세요: ")
-        self.quizzes.append(Quiz(question, answer))  # 
-        print("퀴즈가 추가되었습니다!")
+        question = input("  문제를 입력하세요: ").strip()
+
+        choices = []
+        for i in range(1, 5):
+            choice = input(f"  보기 {i}번을 입력하세요: ").strip()
+            choices.append(choice)
+
+        answer = self.input_number("  정답 번호(1~4)를 입력하세요: ", 1, 4)
+
+        self.quizzes.append(Quiz(question, choices, answer))
+        self.save_state()  # 새 퀴즈 추가 시 자동 저장
+        print("  ✅ 퀴즈가 추가되고 저장되었습니다!")
 
     def show_quiz_list(self):
+        """등록된 전체 퀴즈 목록을 출력한다."""
         print("\n=== 퀴즈 목록 ===")
         for i, quiz in enumerate(self.quizzes, 1):
-            print(f"{i}. {quiz.question}")  # 
+            print(f"  {i}. {quiz.question} (정답: {quiz.answer}번 - {quiz.choices[quiz.answer - 1]})")
 
+    def save_state(self):
+        """퀴즈 목록과 최고 점수를 state.json에 저장한다."""
+        data = {
+            "best_score": self.best_score,
+            "quizzes": [quiz.to_dict() for quiz in self.quizzes]
+        }
+        with open("state.json", "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        print("  💾 데이터 저장 완료!")
+
+    def load_state(self):
+        """state.json에서 퀴즈 + 최고 점수 불러오기"""
+        try:
+            with open("state.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
+            self.quizzes = [Quiz.from_dict(d) for d in data["quizzes"]]
+            self.best_score = data.get("best_score", 0)
+            print("  📂 불러오기 완료!")
+        except FileNotFoundError:
+            print("  📁 저장된 파일이 없습니다. 기본 데이터로 시작합니다.")
+        except (json.JSONDecodeError, KeyError):
+            print("  ⚠️ 파일이 손상되었거나 형식이 맞지 않습니다. 기본 데이터로 복구합니다.")
 
     def run(self):
         """게임 메인 루프"""
+        self.load_state()
         print("\n  🌍 세계사 인물 퀴즈 게임을 시작합니다!")
 
         while True:
@@ -168,16 +217,17 @@ class QuizGame:
             if choice == 1:
                 self.play_quiz()
             elif choice == 2:
-                self.add_quiz()   # 
+                self.add_quiz()
             elif choice == 3:
-                self.show_quiz_list()   # 
+                self.show_quiz_list()
             elif choice == 4:
-                self.show_score()  #
+                self.show_score()
             elif choice == 5:
+                self.save_state()  # 종료 전 최종 상태 저장
                 print("\n  👋 게임을 종료합니다. 수고하셨습니다!")
                 break
+
 
 if __name__ == "__main__":
     game = QuizGame()
     game.run()
-

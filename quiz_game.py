@@ -2,8 +2,7 @@ import json
 
 # quiz_game.py
 class Quiz:
-    """퀴즈 한 문제를 담는 클래스"""
-
+   
     def __init__(self, question, choices, answer):
         """
         question : 문제 텍스트 (str)
@@ -15,7 +14,7 @@ class Quiz:
         self.answer = answer
 
     def to_dict(self):
-        """Quiz 객체 → 딕셔너리 (저장용)"""
+        
         return {
             "question": self.question,
             "choices": self.choices,
@@ -48,15 +47,13 @@ class QuizGame:
 
         # 세계사 인물 퀴즈 기본 데이터
         self.quizzes = [
-            Quiz(
-                "만유인력의 법칙을 발견한 영국의 과학자는?",
-                ["갈릴레오 갈릴레이", "아이작 뉴턴", "알베르트 아인슈타인", "니콜라 테슬라"],
-                2
+            Quiz("대한민국의 제 1대 대통령의 이름은?" , 
+                ["이승만", "박정희", "김구", "이재명"], 
+                1
             ),
-            Quiz(
-                "프랑스 혁명 이후 황제 자리에 오른 인물은?",
-                ["루이 16세", "막시밀리앙 로베스피에르", "나폴레옹 보나파르트", "샤를 드골"],
-                3
+            Quiz("볼셰비키 혁명을 통해 소비에트 연방을 세웠던 러시아 총통의 이름은?",
+                ["스탈린", "레반도프스키", "톨스토이", "레닌"], 
+                4
             ),
             Quiz(
                 "상대성 이론을 발표한 물리학자는?",

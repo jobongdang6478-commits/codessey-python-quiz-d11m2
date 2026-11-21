@@ -170,8 +170,7 @@ python-quiz-game/
 
 * **Repository URL:** `https://github.com/jobongdang6478-commits/codessey-python-quiz-d11m2.git' 
 =======
-* **Repository URL:** `[여기에 GitHub 원격 저장소 URL을 입력하세요]`
->>>>>>> feature/add-code
+
 
 
 ### 커밋 단위 및 메시지 규칙

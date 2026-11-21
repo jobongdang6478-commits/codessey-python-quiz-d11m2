@@ -167,7 +167,7 @@ python-quiz-game/
 
 ### 원격 저장소
 
-<<<<<<< HEAD
+
 * **Repository URL:** `https://github.com/jobongdang6478-commits/codessey-python-quiz-d11m2.git' 
 =======
 * **Repository URL:** `[여기에 GitHub 원격 저장소 URL을 입력하세요]`
@@ -198,8 +198,8 @@ python-quiz-game/
 
 ### Git 실습 증빙 (로그 및 스크린샷)
 
-<<<<<<< HEAD
-* **커밋 히스토리 (10개 이상):** ![실행 결과 화면](./docs/screenshot_commit.png)
+
+* **커밋 히스토리 (10개 이상):** ![실행 결과 화면](./docs/screenshot_commit_history.png)
 * **브랜치 및 병합 기록:**  ![실행 결과 화면](./docs/screenshot_branch.png)
-* **Clone / Pull 실습 기록:** ![실행 결과 화면](./docs/screenshot_gitpull.png)
+* **Clone / Pull 실습 기록:** ![실행 결과 화면](./docs/screenshot_git_pull.png)
 =======

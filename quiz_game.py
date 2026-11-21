@@ -1,4 +1,6 @@
 import json
+import os
+import shutil
 
 # quiz_game.py
 class Quiz:
@@ -44,6 +46,8 @@ class QuizGame:
     """세계사 인물 퀴즈 게임 전체를 관리하는 클래스"""
 
     def __init__(self):
+        self.state_file = "state.json"
+        self.backup_file = "state.json.bak"
         self.best_score = 0     # 최고 점수
 
         # 세계사 인물 퀴즈 기본 데이터
@@ -183,19 +187,24 @@ class QuizGame:
             print(f"  {i}. {quiz.question} (정답: {quiz.answer}번 - {quiz.choices[quiz.answer - 1]})")
 
     def save_state(self):
-        """퀴즈 목록과 최고 점수를 state.json에 저장한다."""
+        """퀴즈 목록과 최고 점수를 state.json에 저장하고 정상 상태 백업(.bak)을 생성한다."""
         data = {
             "best_score": self.best_score,
             "quizzes": [quiz.to_dict() for quiz in self.quizzes]
         }
-        with open("state.json", "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-        print("  💾 데이터 저장 완료!")
+        try:
+            with open(self.state_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            # 정상 저장 완료 후 백업 파일 자동 갱신 (#19 보완)
+            shutil.copy2(self.state_file, self.backup_file)
+            print("  💾 데이터 저장 및 백업 완료!")
+        except OSError as e:
+            print(f"  ⚠️ 데이터 저장 중 오류가 발생했습니다: {e}")
 
     def load_state(self):
-        """state.json에서 퀴즈 + 최고 점수 불러오기"""
+        """state.json에서 퀴즈 + 최고 점수 불러오기 (손상 시 백업 복구 또는 초기화 선택)"""
         try:
-            with open("state.json", "r", encoding="utf-8") as f:
+            with open(self.state_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
             self.quizzes = [Quiz.from_dict(d) for d in data["quizzes"]]
             self.best_score = data.get("best_score", 0)
@@ -203,31 +212,64 @@ class QuizGame:
         except FileNotFoundError:
             print("  📁 저장된 파일이 없습니다. 기본 데이터로 시작합니다.")
         except (json.JSONDecodeError, KeyError):
-            print("  ⚠️ 파일이 손상되었거나 형식이 맞지 않습니다. 기본 데이터로 복구합니다.")
+            print("  ⚠️ 저장 파일이 손상되었거나 형식이 맞지 않습니다.")
+            self.recover_from_backup()
 
-    def run(self):
-        """게임 메인 루프"""
-        self.load_state()
-        print("\n  🌍 세계사 인물 퀴즈 게임을 시작합니다!")
-
-        while True:
-            self.show_menu()
-            choice = self.input_number("  번호를 선택하세요 >> ", 1, 5)
+    def recover_from_backup(self):
+        """백업 파일이 존재할 경우 복구 또는 기본 데이터 초기화 옵션을 제공한다. (#19 보완)"""
+        if os.path.exists(self.backup_file):
+            print("  🔄 정상 상태의 백업 파일(state.json.bak)이 발견되었습니다.")
+            print("    1. 백업 파일에서 복구하기")
+            print("    2. 기본 데이터로 초기화하기")
+            choice = self.input_number("  복구 옵션을 선택하세요 (1~2) >> ", 1, 2)
 
             if choice == 1:
-                self.play_quiz()
-            elif choice == 2:
-                self.add_quiz()
-            elif choice == 3:
-                self.show_quiz_list()
-            elif choice == 4:
-                self.show_score()
-            elif choice == 5:
-                self.save_state()  # 종료 전 최종 상태 저장
-                print("\n  👋 게임을 종료합니다. 수고하셨습니다!")
-                break
+                try:
+                    with open(self.backup_file, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                    self.quizzes = [Quiz.from_dict(d) for d in data["quizzes"]]
+                    self.best_score = data.get("best_score", 0)
+                    shutil.copy2(self.backup_file, self.state_file)
+                    print("  ✅ 백업 파일에서 성공적으로 복구되었습니다!")
+                    return
+                except (json.JSONDecodeError, KeyError, OSError):
+                    print("  ⚠️ 백업 파일도 손상되어 기본 데이터로 초기화합니다.")
+            else:
+                print("  🔄 기본 데이터로 초기화합니다.")
+        else:
+            print("  📁 복구할 백업 파일이 없습니다. 기본 데이터로 복구합니다.")
+
+    def run(self):
+        """게임 메인 루프 (Ctrl+C 및 EOF 강제 종료 시 안전 저장 후 종료)"""
+        try:
+            self.load_state()
+            print("\n  🌍 세계사 인물 퀴즈 게임을 시작합니다!")
+
+            while True:
+                self.show_menu()
+                choice = self.input_number("  번호를 선택하세요 >> ", 1, 5)
+
+                if choice == 1:
+                    self.play_quiz()
+                elif choice == 2:
+                    self.add_quiz()
+                elif choice == 3:
+                    self.show_quiz_list()
+                elif choice == 4:
+                    self.show_score()
+                elif choice == 5:
+                    self.save_state()  # 종료 전 최종 상태 저장
+                    print("\n  👋 게임을 종료합니다. 수고하셨습니다!")
+                    break
+        except (KeyboardInterrupt, EOFError):
+            # Ctrl+C 또는 EOF 입력 시 안전하게 상태 저장 후 종료 (#11 보완)
+            print("\n\n  ⚠️ 강제 종료(Ctrl+C / EOF)가 감지되었습니다.")
+            print("  현재 상태를 안전하게 저장하고 종료합니다...")
+            self.save_state()
+            print("  👋 안전하게 종료되었습니다.")
 
 
 if __name__ == "__main__":
     game = QuizGame()
     game.run()
+    

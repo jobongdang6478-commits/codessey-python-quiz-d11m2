@@ -200,6 +200,6 @@ python-quiz-game/
 
 <<<<<<< HEAD
 * **커밋 히스토리 (10개 이상):** ![실행 결과 화면](./docs/screenshot_commit.png)
-* **브랜치 및 병합 기록:**  ![실행 결과 화면](./docs/screenshot_gitpull.png)
+* **브랜치 및 병합 기록:**  ![실행 결과 화면](./docs/screenshot_branch.png)
 * **Clone / Pull 실습 기록:** ![실행 결과 화면](./docs/screenshot_gitpull.png)
 =======

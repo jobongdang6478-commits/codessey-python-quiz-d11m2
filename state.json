@@ -1,5 +1,5 @@
 {
-  "best_score": 5,
+  "best_score": 7,
   "quizzes": [
     {
       "question": "만유인력의 법칙을 발견한 영국의 과학자는?",
@@ -52,12 +52,12 @@
       "answer": 3
     },
     {
-      "question": "본명은?",
+      "question": "세종대왕의 본명은?",
       "choices": [
         "일도",
         "이도",
         "삼도",
-        "사"
+        "사도"
       ],
       "answer": 2
     },
